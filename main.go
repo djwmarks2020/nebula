@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"runtime/trace"
 	"strconv"
 	"strings"
 	"syscall"
@@ -26,7 +27,7 @@ type CommandRequest struct {
 	Callback chan error
 }
 
-func Main(config *Config, configTest bool, block bool, buildVersion string, logger *logrus.Logger, tunFd *int, commandChan <-chan CommandRequest) error {
+func Main(config *Config, configTest bool, trace bool, block bool, buildVersion string, logger *logrus.Logger, tunFd *int, commandChan <-chan CommandRequest) error {
 	l = logger
 	l.Formatter = &logrus.TextFormatter{
 		FullTimestamp: true,
@@ -54,6 +55,25 @@ func Main(config *Config, configTest bool, block bool, buildVersion string, logg
 			l.WithError(err).Error("Failed to configure the logger")
 		}
 	})
+
+	if trace {
+		filename := fmt.Sprintf("trace.%d.out", os.Getpid())
+		f, err := os.Create(filename)
+		if err != nil {
+			l.WithError(err)
+		}
+
+		defer func() {
+			if err := f.Close(); err != nil {
+				l.WithError(err)
+			}
+		}()
+
+		if err := trace.Start(f); err != nil {
+			l.WithError(err)
+		}
+		defer trace.Stop()
+	}
 
 	// trustedCAs is currently a global, so loadCA operates on that global directly
 	trustedCAs, err = loadCAFromConfig(config)
