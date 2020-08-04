@@ -22,6 +22,7 @@ func main() {
 	configTest := flag.Bool("test", false, "Test the config and print the end result. Non zero exit indicates a faulty config")
 	printVersion := flag.Bool("version", false, "Print version")
 	printUsage := flag.Bool("help", false, "Print command line usage")
+	tracing := flag.Bool("tracing", false, "Produce application trace file")
 
 	flag.Parse()
 
@@ -55,7 +56,7 @@ func main() {
 
 	l := logrus.New()
 	l.Out = os.Stdout
-	err = nebula.Main(config, *configTest, true, Build, l, nil, nil)
+	err = nebula.Main(config, *configTest, *tracing, true, Build, l, nil, nil)
 
 	switch v := err.(type) {
 	case nebula.ContextualError:

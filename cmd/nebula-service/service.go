@@ -37,7 +37,7 @@ func (p *program) run() error {
 
 	l := logrus.New()
 	l.Out = os.Stdout
-	return nebula.Main(config, *p.configTest, true, Build, l, nil, nil)
+	return nebula.Main(config, *p.configTest, false, true, Build, l, nil, nil)
 }
 
 func (p *program) Stop(s service.Service) error {
