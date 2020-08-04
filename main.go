@@ -27,7 +27,7 @@ type CommandRequest struct {
 	Callback chan error
 }
 
-func Main(config *Config, configTest bool, trace bool, block bool, buildVersion string, logger *logrus.Logger, tunFd *int, commandChan <-chan CommandRequest) error {
+func Main(config *Config, configTest bool, tracing bool, block bool, buildVersion string, logger *logrus.Logger, tunFd *int, commandChan <-chan CommandRequest) error {
 	l = logger
 	l.Formatter = &logrus.TextFormatter{
 		FullTimestamp: true,
@@ -56,7 +56,7 @@ func Main(config *Config, configTest bool, trace bool, block bool, buildVersion 
 		}
 	})
 
-	if trace {
+	if tracing {
 		filename := fmt.Sprintf("trace.%d.out", os.Getpid())
 		f, err := os.Create(filename)
 		if err != nil {
